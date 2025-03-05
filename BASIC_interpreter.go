@@ -103,9 +103,4 @@ func main() {
 			i = index
 		}
 	}
-
-	// // If the line is not empty, interpret it
-	// if line.label != "" {
-	// 	interpret(line)
-	// }
 }
