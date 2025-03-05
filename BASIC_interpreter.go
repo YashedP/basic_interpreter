@@ -1,9 +1,15 @@
 package main
 
+import (
+	"bufio"
+	"os"
+	"strings"
+)
+
 type statement struct {
 	label   string
 	command string
-	args    []string
+	args    string
 }
 
 var (
@@ -14,22 +20,49 @@ var (
 // Read the next line from the input and store it in the code variable
 // If the input stream is empty, return an empty statement
 // If the input stream is not empty, return the next statement
-func next_line() statement {
-	return statement{}
+func read_lines() {
+	scanner := bufio.NewScanner(os.Stdin)
+
+	for {
+		scanner.Scan()
+		line := scanner.Text()
+
+		if line == "" {
+			break
+		}
+
+		if err := scanner.Err(); err != nil {
+			break
+		}
+
+		arr := strings.SplitN(line, " ", 3)
+
+		code = append(code, statement{
+			label:   arr[0],
+			command: arr[1],
+			args:    arr[2],
+		})
+	}
 }
 
 // Calls the right function to interpret the statement
-func interpret(statement statement) {
-	switch statement.command {
+func interpret(index int) int {
+	line := code[index]
+
+	index = 0
+
+	switch line.command {
 	case "LET":
 		basicLet()
 	case "IF":
-		basicIf()
+		index = basicIf(index)
 	case "PRINT":
 		basicPrint()
 	case "PRINTLN":
 		basicPrintln()
 	}
+
+	return index
 }
 
 // Implementation of the LET command
@@ -38,8 +71,8 @@ func basicLet() {
 }
 
 // Implementation of the IF command
-func basicIf() {
-
+func basicIf(index int) int {
+	return index
 }
 
 // Implementation of the PRINT command
@@ -56,11 +89,17 @@ func main() {
 	// Initialize the variables hashmap
 	variables = make(map[string]int)
 
-	// Read the first line
-	line := next_line()
+	read_lines()
 
-	// If the line is not empty, interpret it
-	if line.label != "" {
-		interpret(line)
+	for i := 0; i < len(code); i++ {
+		index := interpret(i)
+		if index != 0 {
+			i = index
+		}
 	}
+
+	// // If the line is not empty, interpret it
+	// if line.label != "" {
+	// 	interpret(line)
+	// }
 }
