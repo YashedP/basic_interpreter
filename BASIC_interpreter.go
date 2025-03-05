@@ -53,35 +53,35 @@ func interpret(index int) int {
 
 	switch line.command {
 	case "LET":
-		basicLet()
+		basicLet(line)
 	case "IF":
-		index = basicIf(index)
+		index = basicIf(line, index)
 	case "PRINT":
-		basicPrint()
+		basicPrint(line)
 	case "PRINTLN":
-		basicPrintln()
+		basicPrintln(line)
 	}
 
 	return index
 }
 
 // Implementation of the LET command
-func basicLet() {
+func basicLet(line statement) {
 
 }
 
 // Implementation of the IF command
-func basicIf(index int) int {
+func basicIf(line statement, index int) int {
 	return index
 }
 
 // Implementation of the PRINT command
-func basicPrint() {
+func basicPrint(line statement) {
 
 }
 
 // Implementation of the PRINTLN command
-func basicPrintln() {
+func basicPrintln(line statement) {
 
 }
 
