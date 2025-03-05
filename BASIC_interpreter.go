@@ -65,22 +65,28 @@ func interpret(index int) int {
 	return index
 }
 
-// Implementation of the LET command
+// LET X = <ARITHMETIC_STATEMENT>
+// <ARITHMETIC_STATEMENT> is one of the following: X, X + Y, X - Y, X * Y, or X / Y
 func basicLet(line statement) {
 
 }
 
-// Implementation of the IF command
+// IF <CONDITION> THEN GOTO L
+// <CONDITION> is one of the following: X = Y, X > Y, X < Y, X <> Y, X <= Y, or X >= Y
 func basicIf(line statement, index int) int {
 	return index
 }
 
-// Implementation of the PRINT command
+// PRINT <PRINT_STATEMENT>
+// <PRINT_STATEMENT> is either a variable name or a literal string delimited by double quotes
+// Inside the quotes, the string contains only alphanumeric characters (a-z, A-Z, 0-9) and spaces
 func basicPrint(line statement) {
 
 }
 
-// Implementation of the PRINTLN command
+// PRINTLN <PRINT_STATEMENT>
+// <PRINT_STATEMENT> is either a variable name or a literal string delimited by double quotes
+// Inside the quotes, the string contains only alphanumeric characters (a-z, A-Z, 0-9) and spaces
 func basicPrintln(line statement) {
 
 }
