@@ -75,7 +75,6 @@ func interpret(index int) int {
 }
 
 func isInteger(str string) bool {
-
 	_, ok := strconv.Atoi(str)
 	return ok == nil
 
@@ -84,7 +83,6 @@ func isInteger(str string) bool {
 // LET X = <ARITHMETIC_STATEMENT>
 // <ARITHMETIC_STATEMENT> is one of the following: X, X + Y, X - Y, X * Y, or X / Y
 func basicLet(line statement) {
-
 	var letter string
 	letter = string(line.args[0])
 	var strArray []string
@@ -210,7 +208,6 @@ func basicIf(line statement, index int) int {
 // <PRINT_STATEMENT> is either a variable name or a literal string delimited by double quotes
 // Inside the quotes, the string contains only alphanumeric characters (a-z, A-Z, 0-9) and spaces
 func basicPrint(line statement) {
-
 	// condition for printing a string; the reason it's compared to 34 is because str[index] returns the byte value
 	if len(line.args) > 0 && line.args[0] == 34 && line.args[len(line.args)-1] == 34 {
 		print(line.args[1 : len(line.args)-1])
@@ -223,7 +220,6 @@ func basicPrint(line statement) {
 // <PRINT_STATEMENT> is either a variable name or a literal string delimited by double quotes
 // Inside the quotes, the string contains only alphanumeric characters (a-z, A-Z, 0-9) and spaces
 func basicPrintln(line statement) {
-
 	// condition for printing a string; the reason it's compared to 34 is because str[index] returns the byte value
 	if len(line.args) > 0 && line.args[0] == 34 && line.args[len(line.args)-1] == 34 {
 		println(line.args[1 : len(line.args)-1])
