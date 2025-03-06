@@ -64,7 +64,7 @@ func interpret(index int) int {
 	case "LET":
 		basicLet(line)
 	case "IF":
-		index = basicIf(line, index)
+		index = basicIf(line)
 	case "PRINT":
 		basicPrint(line)
 	case "PRINTLN":
@@ -200,7 +200,52 @@ func basicLet(line statement) {
 
 // IF <CONDITION> THEN GOTO L
 // <CONDITION> is one of the following: X = Y, X > Y, X < Y, X <> Y, X <= Y, or X >= Y
-func basicIf(line statement, index int) int {
+func basicIf(line statement) int {
+
+	var strArray []string
+	strArray = strings.Fields(line.args)
+	var firstTerm int
+	var secondTerm int
+	var operator string
+	index := 0
+
+	firstTerm, _ = strconv.Atoi(strArray[1])
+	secondTerm, _ = strconv.Atoi(strArray[3])
+	operator = strArray[2]
+
+	switch operator {
+	case "=":
+		if firstTerm == secondTerm {
+			index, _ = strconv.Atoi(strArray[6])
+			index = index / 10
+		}
+	case ">":
+		if firstTerm > secondTerm {
+			index, _ = strconv.Atoi(strArray[6])
+			index = index / 10
+		}
+	case "<":
+		if firstTerm < secondTerm {
+			index, _ = strconv.Atoi(strArray[6])
+			index = index / 10
+		}
+	case "<>":
+		if firstTerm == secondTerm {
+			index, _ = strconv.Atoi(strArray[6])
+			index = index / 10
+		}
+	case "<=":
+		if firstTerm <= secondTerm {
+			index, _ = strconv.Atoi(strArray[6])
+			index = index / 10
+		}
+	case ">=":
+		if firstTerm >= secondTerm {
+			index, _ = strconv.Atoi(strArray[6])
+			index = index / 10
+		}
+	}
+
 	return index
 }
 
