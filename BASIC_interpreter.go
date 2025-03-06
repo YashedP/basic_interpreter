@@ -3,11 +3,13 @@ package main
 import (
 	"bufio"
 	"os"
+	"sort"
+	"strconv"
 	"strings"
 )
 
 type statement struct {
-	label   string
+	label   int
 	command string
 	args    string
 }
@@ -38,11 +40,18 @@ func read_lines() {
 		arr := strings.SplitN(line, " ", 3)
 
 		code = append(code, statement{
-			label:   arr[0],
+			label:   func() int { i, _ := strconv.Atoi(arr[0]); return i }(),
 			command: arr[1],
 			args:    arr[2],
 		})
 	}
+}
+
+func sort_lines() {
+	// Sort the code array by label
+	sort.Slice(code, func(i, j int) bool {
+		return code[i].label < code[j].label
+	})
 }
 
 // Calls the right function to interpret the statement
@@ -96,11 +105,16 @@ func main() {
 	variables = make(map[string]int)
 
 	read_lines()
+	sort_lines()
 
 	for i := 0; i < len(code); i++ {
-		index := interpret(i)
-		if index != 0 {
-			i = index
-		}
+		println(code[i].label, code[i].command, code[i].args)
 	}
+
+	// for i := 0; i < len(code); i++ {
+	// 	index := interpret(i)
+	// 	if index != 0 {
+	// 		i = index
+	// 	}
+	// }
 }
