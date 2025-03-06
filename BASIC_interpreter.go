@@ -81,14 +81,28 @@ func basicIf(line statement, index int) int {
 // <PRINT_STATEMENT> is either a variable name or a literal string delimited by double quotes
 // Inside the quotes, the string contains only alphanumeric characters (a-z, A-Z, 0-9) and spaces
 func basicPrint(line statement) {
-
+	// condition for printing a string
+	if len(line.args) > 0 && line.args[0] == '"' && line.args[len(line.args)-1] == '"' {
+		fmt.Print(line.args[1 : len(line.args)-1])
+	} else if val, ok := variables[line.args]; ok { // condition for printing a variable that exists
+		fmt.Print(val)
+	} else {
+		// handle misinput here
+	}
 }
 
 // PRINTLN <PRINT_STATEMENT>
 // <PRINT_STATEMENT> is either a variable name or a literal string delimited by double quotes
 // Inside the quotes, the string contains only alphanumeric characters (a-z, A-Z, 0-9) and spaces
 func basicPrintln(line statement) {
-
+	// condition for printing a string
+	if len(line.args) > 0 && line.args[0] == '"' && line.args[len(line.args)-1] == '"' {
+		fmt.Println(line.args[1 : len(line.args)-1])
+	} else if val, ok := variables[line.args]; ok { // condition for printing a variable that exists
+		fmt.Println(val)
+	} else {
+		// handle misinput here
+	}
 }
 
 func main() {
