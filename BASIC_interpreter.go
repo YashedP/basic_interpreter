@@ -216,8 +216,6 @@ func basicPrint(line statement) {
 		print(line.args[1 : len(line.args)-1])
 	} else if val, ok := variables[line.args]; ok { // condition for printing a variable that exists
 		print(val)
-	} else if val, ok := undefinedVariables[line.args]; ok {
-		print(val)
 	}
 }
 
@@ -229,11 +227,9 @@ func basicPrintln(line statement) {
 	// condition for printing a string; the reason it's compared to 34 is because str[index] returns the byte value
 	if len(line.args) > 0 && line.args[0] == 34 && line.args[len(line.args)-1] == 34 {
 		println(line.args[1 : len(line.args)-1])
-	} else if val, ok := variables[line.args]; ok { // condition for printing a variable that exists
+	} else if val, ok := variables[line.args]; ok {
 		println(val)
-	} else if val, ok := undefinedVariables[line.args]; ok {
-		println(val)
-	} else
+	}
 }
 
 func main() {
