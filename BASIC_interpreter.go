@@ -92,9 +92,9 @@ func basicIf(line statement, index int) int {
 func basicPrint(line statement) {
 	// condition for printing a string
 	if len(line.args) > 0 && line.args[0] == '"' && line.args[len(line.args)-1] == '"' {
-		fmt.Print(line.args[1 : len(line.args)-1])
+		print(line.args[1 : len(line.args)-1])
 	} else if val, ok := variables[line.args]; ok { // condition for printing a variable that exists
-		fmt.Print(val)
+		print(val)
 	} else {
 		// handle misinput here
 	}
@@ -106,9 +106,9 @@ func basicPrint(line statement) {
 func basicPrintln(line statement) {
 	// condition for printing a string
 	if len(line.args) > 0 && line.args[0] == '"' && line.args[len(line.args)-1] == '"' {
-		fmt.Println(line.args[1 : len(line.args)-1])
+		println(line.args[1 : len(line.args)-1])
 	} else if val, ok := variables[line.args]; ok { // condition for printing a variable that exists
-		fmt.Println(val)
+		println(val)
 	} else {
 		// handle misinput here
 	}
@@ -122,13 +122,9 @@ func main() {
 	sort_lines()
 
 	for i := 0; i < len(code); i++ {
-		println(code[i].label, code[i].command, code[i].args)
+		index := interpret(i)
+		if index != 0 {
+			i = index
+		}
 	}
-
-	// for i := 0; i < len(code); i++ {
-	// 	index := interpret(i)
-	// 	if index != 0 {
-	// 		i = index
-	// 	}
-	// }
 }
