@@ -238,7 +238,7 @@ func main() {
 	for i := 0; i < len(code); i++ {
 		index := interpret(i)
 		if index != 0 {
-			i = index
+			i = index - 1
 		}
 	}
 }
