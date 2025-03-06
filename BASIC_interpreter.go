@@ -57,14 +57,13 @@ func sort_lines() {
 // Calls the right function to interpret the statement
 func interpret(index int) int {
 	line := code[index]
-
-	index = 0
+	index = index + 1
 
 	switch line.command {
 	case "LET":
 		basicLet(line)
 	case "IF":
-		index = basicIf(line)
+		index = basicIf(line, index)
 	case "PRINT":
 		basicPrint(line)
 	case "PRINTLN":
@@ -83,14 +82,10 @@ func isInteger(str string) bool {
 // LET X = <ARITHMETIC_STATEMENT>
 // <ARITHMETIC_STATEMENT> is one of the following: X, X + Y, X - Y, X * Y, or X / Y
 func basicLet(line statement) {
-	var letter string
-	letter = string(line.args[0])
-	var strArray []string
-	strArray = strings.Fields(line.args)
-	var firstTerm string
-	var secondTerm string
-	var intFirstTerm int
-	var intSecondTerm int
+	letter := string(line.args[0])
+	strArray := strings.Fields(line.args)
+	var firstTerm int
+	var secondTerm int
 
 	// This if statement checks if there are any operations and if not, stores the value in variable
 	if len(strArray) < 4 {
@@ -102,148 +97,98 @@ func basicLet(line statement) {
 		return
 	}
 
-	firstTerm = strArray[2]
-	secondTerm = strArray[4]
-	intFirstTerm = 0
-	intSecondTerm = 0
+	// Converts the argument to integer values
+	if isInteger(strArray[2]) {
+		firstTerm, _ = strconv.Atoi(strArray[2])
+	} else {
+		firstTerm = variables[strArray[2]]
+	}
+
+	if isInteger(strArray[4]) {
+		secondTerm, _ = strconv.Atoi(strArray[4])
+	} else {
+		secondTerm = variables[strArray[4]]
+	}
 
 	// Processing Operations
 	if strings.Contains(line.args, "+") {
-		if isInteger(firstTerm) && isInteger(secondTerm) {
-			intFirstTerm, _ = strconv.Atoi(firstTerm)
-			intSecondTerm, _ = strconv.Atoi(secondTerm)
-			variables[letter] = intFirstTerm + intSecondTerm
-
-		} else if isInteger(firstTerm) {
-			intFirstTerm, _ = strconv.Atoi(firstTerm)
-			intSecondTerm = variables[secondTerm]
-			variables[letter] = intFirstTerm + intSecondTerm
-
-		} else if isInteger(secondTerm) {
-			intSecondTerm, _ = strconv.Atoi(secondTerm)
-			intFirstTerm = variables[firstTerm]
-			variables[letter] = intFirstTerm + intSecondTerm
-
-		} else {
-			intSecondTerm = variables[secondTerm]
-			intFirstTerm = variables[firstTerm]
-			variables[letter] = intFirstTerm + intSecondTerm
-		}
+		variables[letter] = firstTerm + secondTerm
 
 	} else if strings.Contains(line.args, "-") {
-		if isInteger(firstTerm) && isInteger(secondTerm) {
-			intFirstTerm, _ = strconv.Atoi(firstTerm)
-			intSecondTerm, _ = strconv.Atoi(secondTerm)
-			variables[letter] = intFirstTerm - intSecondTerm
-
-		} else if isInteger(firstTerm) {
-			intFirstTerm, _ = strconv.Atoi(firstTerm)
-			intSecondTerm = variables[secondTerm]
-			variables[letter] = intFirstTerm - intSecondTerm
-
-		} else if isInteger(secondTerm) {
-			intSecondTerm, _ = strconv.Atoi(secondTerm)
-			intFirstTerm = variables[firstTerm]
-			variables[letter] = intFirstTerm - intSecondTerm
-
-		} else {
-			intSecondTerm = variables[secondTerm]
-			intFirstTerm = variables[firstTerm]
-			variables[letter] = intFirstTerm - intSecondTerm
-		}
+		variables[letter] = firstTerm - secondTerm
 
 	} else if strings.Contains(line.args, "*") {
-		if isInteger(firstTerm) && isInteger(secondTerm) {
-			intFirstTerm, _ = strconv.Atoi(firstTerm)
-			intSecondTerm, _ = strconv.Atoi(secondTerm)
-			variables[letter] = intFirstTerm * intSecondTerm
-
-		} else if isInteger(firstTerm) {
-			intFirstTerm, _ = strconv.Atoi(firstTerm)
-			intSecondTerm = variables[secondTerm]
-			variables[letter] = intFirstTerm * intSecondTerm
-
-		} else if isInteger(secondTerm) {
-			intSecondTerm, _ = strconv.Atoi(secondTerm)
-			intFirstTerm = variables[firstTerm]
-			variables[letter] = intFirstTerm * intSecondTerm
-
-		} else {
-			intSecondTerm = variables[secondTerm]
-			intFirstTerm = variables[firstTerm]
-			variables[letter] = intFirstTerm * intSecondTerm
-		}
+		variables[letter] = firstTerm * secondTerm
 
 	} else if strings.Contains(line.args, "/") {
-		if isInteger(firstTerm) && isInteger(secondTerm) {
-			intFirstTerm, _ = strconv.Atoi(firstTerm)
-			intSecondTerm, _ = strconv.Atoi(secondTerm)
-			variables[letter] = intFirstTerm / intSecondTerm
+		variables[letter] = firstTerm / secondTerm
 
-		} else if isInteger(firstTerm) {
-			intFirstTerm, _ = strconv.Atoi(firstTerm)
-			intSecondTerm = variables[secondTerm]
-			variables[letter] = intFirstTerm / intSecondTerm
-
-		} else if isInteger(secondTerm) {
-			intSecondTerm, _ = strconv.Atoi(secondTerm)
-			intFirstTerm = variables[firstTerm]
-			variables[letter] = intFirstTerm / intSecondTerm
-
-		} else {
-			intSecondTerm = variables[secondTerm]
-			intFirstTerm = variables[firstTerm]
-			variables[letter] = intFirstTerm / intSecondTerm
-		}
 	}
 }
 
 // IF <CONDITION> THEN GOTO L
 // <CONDITION> is one of the following: X = Y, X > Y, X < Y, X <> Y, X <= Y, or X >= Y
-func basicIf(line statement) int {
+func basicIf(line statement, index int) int {
 
-	var strArray []string
-	strArray = strings.Fields(line.args)
+	strArray := strings.Fields(line.args)
 	var firstTerm int
 	var secondTerm int
 	var operator string
-	index := 0
 
-	firstTerm, _ = strconv.Atoi(strArray[1])
-	secondTerm, _ = strconv.Atoi(strArray[3])
-	operator = strArray[2]
+	if isInteger(strArray[0]) {
+		firstTerm, _ = strconv.Atoi(strArray[0])
+	} else {
+		firstTerm = variables[strArray[0]]
+	}
+	if isInteger(strArray[2]) {
+		secondTerm, _ = strconv.Atoi(strArray[2])
+	} else {
+		secondTerm = variables[strArray[2]]
+	}
+	operator = strArray[1]
 
 	switch operator {
 	case "=":
 		if firstTerm == secondTerm {
-			index, _ = strconv.Atoi(strArray[6])
+			index, _ = strconv.Atoi(strArray[5])
 			index = index / 10
+			index = index - 1
 		}
+
 	case ">":
 		if firstTerm > secondTerm {
-			index, _ = strconv.Atoi(strArray[6])
+			index, _ = strconv.Atoi(strArray[5])
 			index = index / 10
+			index = index - 1
 		}
+
 	case "<":
 		if firstTerm < secondTerm {
-			index, _ = strconv.Atoi(strArray[6])
+			index, _ = strconv.Atoi(strArray[5])
 			index = index / 10
+			index = index - 1
 		}
+
 	case "<>":
 		if firstTerm == secondTerm {
-			index, _ = strconv.Atoi(strArray[6])
+			index, _ = strconv.Atoi(strArray[5])
 			index = index / 10
+			index = index - 1
 		}
+
 	case "<=":
 		if firstTerm <= secondTerm {
-			index, _ = strconv.Atoi(strArray[6])
+			index, _ = strconv.Atoi(strArray[5])
 			index = index / 10
+			index = index - 1
 		}
+
 	case ">=":
 		if firstTerm >= secondTerm {
-			index, _ = strconv.Atoi(strArray[6])
+			index, _ = strconv.Atoi(strArray[5])
 			index = index / 10
 		}
+
 	}
 
 	return index
@@ -280,10 +225,8 @@ func main() {
 	read_lines()
 	sort_lines()
 
-	for i := 0; i < len(code); i++ {
-		index := interpret(i)
-		if index != 0 {
-			i = index - 1
-		}
+	for i := 0; i < len(code); {
+		i = interpret(i)
+
 	}
 }
