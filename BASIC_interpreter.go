@@ -12,7 +12,7 @@ import (
 type statement struct {
 	label   int
 	command string
-	args    string
+	args    []string
 }
 
 var (
@@ -40,10 +40,23 @@ func read_lines() {
 
 		arr := strings.SplitN(line, " ", 3)
 
+		str := arr[2]
+
+		var args = []string{}
+
+		switch arr[1] {
+		case "LET":
+			args = strings.Fields(str)
+		case "IF":
+			args = strings.Fields(str)
+		default:
+			args = []string{str}
+		}
+
 		code = append(code, statement{
 			label:   func() int { i, _ := strconv.Atoi(arr[0]); return i }(),
 			command: arr[1],
-			args:    arr[2],
+			args:    args,
 		})
 	}
 }
@@ -75,121 +88,108 @@ func interpret(index int) int {
 }
 
 func isInteger(str string) bool {
-	_, ok := strconv.Atoi(str)
-	return ok == nil
-
+	// Check using ascii values of num range
+	if str[0] >= 48 && str[0] <= 57 {
+		return true
+	}
+	return false
 }
 
 // LET X = <ARITHMETIC_STATEMENT>
 // <ARITHMETIC_STATEMENT> is one of the following: X, X + Y, X - Y, X * Y, or X / Y
 func basicLet(line statement) {
-	letter := string(line.args[0])
-	strArray := strings.Fields(line.args)
-	var firstTerm int
-	var secondTerm int
-
-	// This if statement checks if there are any operations and if not, stores the value in variable
-	if len(strArray) < 4 {
-		if isInteger(strArray[2]) {
-			variables[letter], _ = strconv.Atoi(strArray[2])
+	switch len(line.args) {
+	case 1:
+		if isInteger(line.args[0]) {
+			variables[line.args[0]], _ = strconv.Atoi(line.args[2])
 		} else {
-			variables[letter] = variables[strArray[2]]
+			variables[line.args[0]] = variables[line.args[2]]
 		}
-		return
-	}
+	case 5:
+		var firstTerm, secondTerm int
 
-	// Converts the argument to integer values
-	if isInteger(strArray[2]) {
-		firstTerm, _ = strconv.Atoi(strArray[2])
-	} else {
-		firstTerm = variables[strArray[2]]
-	}
+		// Convert first term
+		if isInteger(line.args[2]) {
+			firstTerm, _ = strconv.Atoi(line.args[2])
+		} else {
+			firstTerm = variables[line.args[2]]
+		}
 
-	if isInteger(strArray[4]) {
-		secondTerm, _ = strconv.Atoi(strArray[4])
-	} else {
-		secondTerm = variables[strArray[4]]
-	}
+		// Convert second term
+		if isInteger(line.args[4]) {
+			secondTerm, _ = strconv.Atoi(line.args[4])
+		} else {
+			secondTerm = variables[line.args[4]]
+		}
 
-	// Processing Operations
-	if strings.Contains(line.args, "+") {
-		variables[letter] = firstTerm + secondTerm
-
-	} else if strings.Contains(line.args, "-") {
-		variables[letter] = firstTerm - secondTerm
-
-	} else if strings.Contains(line.args, "*") {
-		variables[letter] = firstTerm * secondTerm
-
-	} else if strings.Contains(line.args, "/") {
-		variables[letter] = firstTerm / secondTerm
-
+		// Perform the operation based on the operator
+		switch line.args[3] {
+		case "+":
+			variables[line.args[0]] = firstTerm + secondTerm
+		case "-":
+			variables[line.args[0]] = firstTerm - secondTerm
+		case "*":
+			variables[line.args[0]] = firstTerm * secondTerm
+		case "/":
+			if secondTerm != 0 {
+				variables[line.args[0]] = firstTerm / secondTerm
+			}
+		}
 	}
 }
 
 // IF <CONDITION> THEN GOTO L
 // <CONDITION> is one of the following: X = Y, X > Y, X < Y, X <> Y, X <= Y, or X >= Y
 func basicIf(line statement, index int) int {
+	var firstTerm, secondTerm int
 
-	strArray := strings.Fields(line.args)
-	var firstTerm int
-	var secondTerm int
-	var operator string
-
-	if isInteger(strArray[0]) {
-		firstTerm, _ = strconv.Atoi(strArray[0])
+	if isInteger(line.args[1]) {
+		firstTerm, _ = strconv.Atoi(line.args[1])
 	} else {
-		firstTerm = variables[strArray[0]]
+		firstTerm = variables[line.args[1]]
 	}
-	if isInteger(strArray[2]) {
-		secondTerm, _ = strconv.Atoi(strArray[2])
+	if isInteger(line.args[3]) {
+		secondTerm, _ = strconv.Atoi(line.args[3])
 	} else {
-		secondTerm = variables[strArray[2]]
+		secondTerm = variables[line.args[3]]
 	}
-	operator = strArray[1]
 
-	switch operator {
+	switch line.args[2] {
 	case "=":
 		if firstTerm == secondTerm {
-			index, _ = strconv.Atoi(strArray[5])
+			index, _ = strconv.Atoi(line.args[6])
 			index = index / 10
 			index = index - 1
 		}
-
 	case ">":
 		if firstTerm > secondTerm {
-			index, _ = strconv.Atoi(strArray[5])
+			index, _ = strconv.Atoi(line.args[6])
 			index = index / 10
 			index = index - 1
 		}
-
 	case "<":
 		if firstTerm < secondTerm {
-			index, _ = strconv.Atoi(strArray[5])
+			index, _ = strconv.Atoi(line.args[6])
 			index = index / 10
 			index = index - 1
 		}
-
 	case "<>":
 		if firstTerm == secondTerm {
-			index, _ = strconv.Atoi(strArray[5])
+			index, _ = strconv.Atoi(line.args[6])
 			index = index / 10
 			index = index - 1
 		}
-
 	case "<=":
 		if firstTerm <= secondTerm {
-			index, _ = strconv.Atoi(strArray[5])
+			index, _ = strconv.Atoi(line.args[6])
 			index = index / 10
 			index = index - 1
 		}
-
 	case ">=":
 		if firstTerm >= secondTerm {
-			index, _ = strconv.Atoi(strArray[5])
+			index, _ = strconv.Atoi(line.args[6])
 			index = index / 10
 		}
-
 	}
 
 	return index
@@ -199,10 +199,12 @@ func basicIf(line statement, index int) int {
 // <PRINT_STATEMENT> is either a variable name or a literal string delimited by double quotes
 // Inside the quotes, the string contains only alphanumeric characters (a-z, A-Z, 0-9) and spaces
 func basicPrint(line statement) {
+	str := line.args[0]
+	println(str)
 	// condition for printing a string; the reason it's compared to 34 is because str[index] returns the byte value
-	if len(line.args) > 0 && line.args[0] == 34 && line.args[len(line.args)-1] == 34 {
-		fmt.Print(line.args[1 : len(line.args)-1])
-	} else if val, ok := variables[line.args]; ok { // condition for printing a variable that exists
+	if len(str) > 0 && str[0] == 34 && str[len(str)-1] == 34 {
+		fmt.Print(line.args[1 : len(str)-1])
+	} else if val, ok := variables[str]; ok { // condition for printing a variable that exists
 		fmt.Print(val)
 	}
 }
@@ -211,10 +213,11 @@ func basicPrint(line statement) {
 // <PRINT_STATEMENT> is either a variable name or a literal string delimited by double quotes
 // Inside the quotes, the string contains only alphanumeric characters (a-z, A-Z, 0-9) and spaces
 func basicPrintln(line statement) {
+	str := line.args[0]
 	// condition for printing a string; the reason it's compared to 34 is because str[index] returns the byte value
-	if len(line.args) > 0 && line.args[0] == 34 && line.args[len(line.args)-1] == 34 {
-		fmt.Println(line.args[1 : len(line.args)-1])
-	} else if val, ok := variables[line.args]; ok {
+	if len(str) > 0 && str[0] == 34 && str[len(str)-1] == 34 {
+		fmt.Println(str[1 : len(str)-1])
+	} else if val, ok := variables[str]; ok {
 		fmt.Println(val)
 	}
 }
@@ -228,6 +231,5 @@ func main() {
 
 	for i := 0; i < len(code); {
 		i = interpret(i)
-
 	}
 }
