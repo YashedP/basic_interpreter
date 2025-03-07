@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"fmt"
 	"os"
 	"sort"
 	"strconv"
@@ -200,9 +201,9 @@ func basicIf(line statement, index int) int {
 func basicPrint(line statement) {
 	// condition for printing a string; the reason it's compared to 34 is because str[index] returns the byte value
 	if len(line.args) > 0 && line.args[0] == 34 && line.args[len(line.args)-1] == 34 {
-		print(line.args[1 : len(line.args)-1])
+		fmt.Print(line.args[1 : len(line.args)-1])
 	} else if val, ok := variables[line.args]; ok { // condition for printing a variable that exists
-		print(val)
+		fmt.Print(val)
 	}
 }
 
@@ -212,9 +213,9 @@ func basicPrint(line statement) {
 func basicPrintln(line statement) {
 	// condition for printing a string; the reason it's compared to 34 is because str[index] returns the byte value
 	if len(line.args) > 0 && line.args[0] == 34 && line.args[len(line.args)-1] == 34 {
-		println(line.args[1 : len(line.args)-1])
+		fmt.Println(line.args[1 : len(line.args)-1])
 	} else if val, ok := variables[line.args]; ok {
-		println(val)
+		fmt.Println(val)
 	}
 }
 
