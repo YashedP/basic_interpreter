@@ -73,17 +73,25 @@ func sort_lines() {
 // Calls the right function to interpret the statement
 func interpret(index int) int {
 	line := code[index]
-	index = index + 1
 
-	switch line.command {
-	case "LET":
-		basicLet(line)
-	case "IF":
-		index = basicIf(line, index)
-	case "PRINT":
-		basicPrint(line)
-	case "PRINTLN":
-		basicPrintln(line)
+	index = 0
+
+	switch line.command[0] {
+	case 'L': // LET
+		if line.command == "LET" {
+			basicLet(line)
+		}
+	case 'I': // IF
+		if line.command == "IF" {
+			index = basicIf(line, index)
+		}
+	case 'P': // PRINT or PRINTLN
+		switch line.command[len(line.command)-1] {
+		case 'T':
+			basicPrint(line)
+		case 'N':
+			basicPrintln(line)
+		}
 	}
 
 	return index
