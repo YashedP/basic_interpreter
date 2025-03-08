@@ -74,8 +74,7 @@ func sort_lines() {
 // Calls the right function to interpret the statement
 func interpret(index int) int {
 	line := code[index]
-
-	index = 0
+	index = index + 1
 
 	switch line.command[0] {
 	case 'L': // LET
@@ -237,7 +236,7 @@ func main() {
 	read_lines()
 	sort_lines()
 
-	for i := 0; i < len(code); i++ {
+	for i := 0; i < len(code); {
 		i = interpret(i)
 	}
 }
