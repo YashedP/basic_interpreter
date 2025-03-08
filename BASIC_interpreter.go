@@ -24,9 +24,10 @@ var (
 // If the input stream is empty, return an empty statement
 // If the input stream is not empty, return the next statement
 func read_lines() {
-	scanner := bufio.NewScanner(os.Stdin)
-	// file, _ := os.Open("test1")
-	// scanner := bufio.NewScanner(file)
+	// scanner := bufio.NewScanner(os.Stdin)
+
+	file, _ := os.Open("test1")
+	scanner := bufio.NewScanner(file)
 
 	for {
 		scanner.Scan()
@@ -236,7 +237,7 @@ func main() {
 	read_lines()
 	sort_lines()
 
-	for i := 0; i < len(code); {
+	for i := 0; i < len(code); i++ {
 		i = interpret(i)
 	}
 }
