@@ -19,6 +19,7 @@ var (
 	code      []statement
 	variables map[string]int
 	labels    map[int]int
+	writer    *bufio.Writer
 )
 
 // Read the next line from the input and store it in the code variable
@@ -27,7 +28,7 @@ var (
 func read_lines() {
 	scanner := bufio.NewScanner(os.Stdin)
 
-	// file, _ := os.Open("test1")
+	// file, _ := os.Open("test2")
 	// scanner := bufio.NewScanner(file)
 
 	for {
@@ -106,11 +107,8 @@ func interpret(index int) int {
 }
 
 func isInteger(str string) bool {
-	// Check using ascii values of num range
-	if str[0] >= 48 && str[0] <= 57 {
-		return true
-	}
-	return false
+	_, err := strconv.Atoi(str)
+	return err == nil
 }
 
 // LET X = <ARITHMETIC_STATEMENT>
@@ -189,7 +187,7 @@ func basicIf(line statement, index int) int {
 			condition = true
 		}
 	case "<>":
-		if firstTerm == secondTerm {
+		if firstTerm != secondTerm {
 			condition = true
 		}
 	case "<=":
@@ -216,9 +214,9 @@ func basicPrint(line statement) {
 	str := line.args[0]
 	// condition for printing a string; the reason it's compared to 34 is because str[index] returns the byte value
 	if len(str) > 0 && str[0] == 34 && str[len(str)-1] == 34 {
-		fmt.Print(str[1 : len(str)-1])
+		writer.WriteString(str[1 : len(str)-1])
 	} else if val, ok := variables[str]; ok { // condition for printing a variable that exists
-		fmt.Print(val)
+		writer.WriteString(fmt.Sprintf("%d", val))
 	}
 }
 
@@ -229,9 +227,9 @@ func basicPrintln(line statement) {
 	str := line.args[0]
 	// condition for printing a string; the reason it's compared to 34 is because str[index] returns the byte value
 	if len(str) > 0 && str[0] == 34 && str[len(str)-1] == 34 {
-		fmt.Println(str[1 : len(str)-1])
+		writer.WriteString(str[1:len(str)-1] + "\n")
 	} else if val, ok := variables[str]; ok {
-		fmt.Println(val)
+		writer.WriteString(fmt.Sprintf("%d\n", val))
 	}
 }
 
@@ -239,6 +237,7 @@ func main() {
 	// Initialize the variables hashmap
 	variables = make(map[string]int)
 	labels = make(map[int]int)
+	writer = bufio.NewWriter(os.Stdout)
 
 	read_lines()
 	sort_lines()
@@ -247,4 +246,6 @@ func main() {
 	for i := 0; i < len(code); {
 		i = interpret(i)
 	}
+
+	writer.Flush()
 }
