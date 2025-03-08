@@ -18,6 +18,7 @@ type statement struct {
 var (
 	code      []statement
 	variables map[string]int
+	labels    map[int]int
 )
 
 // Read the next line from the input and store it in the code variable
@@ -61,6 +62,13 @@ func read_lines() {
 			command: arr[1],
 			args:    args,
 		})
+	}
+}
+
+func add_labels() {
+	// Add the labels to the code array
+	for i := 0; i < len(code); i++ {
+		labels[code[i].label] = i
 	}
 }
 
@@ -195,9 +203,7 @@ func basicIf(line statement, index int) int {
 	}
 
 	if condition {
-		index, _ = strconv.Atoi(line.args[5])
-		index = index / 10
-		index = index - 1
+		index = labels[func() int { i, _ := strconv.Atoi(line.args[5]); return i }()]
 	}
 
 	return index
@@ -232,9 +238,11 @@ func basicPrintln(line statement) {
 func main() {
 	// Initialize the variables hashmap
 	variables = make(map[string]int)
+	labels = make(map[int]int)
 
 	read_lines()
 	sort_lines()
+	add_labels()
 
 	for i := 0; i < len(code); {
 		i = interpret(i)
