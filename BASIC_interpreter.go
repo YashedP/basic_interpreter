@@ -25,6 +25,8 @@ var (
 // If the input stream is not empty, return the next statement
 func read_lines() {
 	scanner := bufio.NewScanner(os.Stdin)
+	// file, _ := os.Open("test1")
+	// scanner := bufio.NewScanner(file)
 
 	for {
 		scanner.Scan()
@@ -105,6 +107,8 @@ func basicLet(line statement) {
 		} else {
 			variables[line.args[0]] = variables[line.args[2]]
 		}
+	case 3:
+		variables[line.args[0]] = func() int { i, _ := strconv.Atoi(line.args[2]); return i }()
 	case 5:
 		var firstTerm, secondTerm int
 
@@ -143,53 +147,49 @@ func basicLet(line statement) {
 func basicIf(line statement, index int) int {
 	var firstTerm, secondTerm int
 
-	if isInteger(line.args[1]) {
-		firstTerm, _ = strconv.Atoi(line.args[1])
+	if isInteger(line.args[0]) {
+		firstTerm, _ = strconv.Atoi(line.args[0])
 	} else {
-		firstTerm = variables[line.args[1]]
+		firstTerm = variables[line.args[0]]
 	}
-	if isInteger(line.args[3]) {
-		secondTerm, _ = strconv.Atoi(line.args[3])
+	if isInteger(line.args[2]) {
+		secondTerm, _ = strconv.Atoi(line.args[2])
 	} else {
-		secondTerm = variables[line.args[3]]
+		secondTerm = variables[line.args[2]]
 	}
 
-	switch line.args[2] {
+	condition := false
+	switch line.args[1] {
 	case "=":
 		if firstTerm == secondTerm {
-			index, _ = strconv.Atoi(line.args[6])
-			index = index / 10
-			index = index - 1
+			condition = true
 		}
 	case ">":
 		if firstTerm > secondTerm {
-			index, _ = strconv.Atoi(line.args[6])
-			index = index / 10
-			index = index - 1
+			condition = true
 		}
 	case "<":
 		if firstTerm < secondTerm {
-			index, _ = strconv.Atoi(line.args[6])
-			index = index / 10
-			index = index - 1
+			condition = true
 		}
 	case "<>":
 		if firstTerm == secondTerm {
-			index, _ = strconv.Atoi(line.args[6])
-			index = index / 10
-			index = index - 1
+			condition = true
 		}
 	case "<=":
 		if firstTerm <= secondTerm {
-			index, _ = strconv.Atoi(line.args[6])
-			index = index / 10
-			index = index - 1
+			condition = true
 		}
 	case ">=":
 		if firstTerm >= secondTerm {
-			index, _ = strconv.Atoi(line.args[6])
-			index = index / 10
+			condition = true
 		}
+	}
+
+	if condition {
+		index, _ = strconv.Atoi(line.args[5])
+		index = index / 10
+		index = index - 1
 	}
 
 	return index
@@ -200,10 +200,9 @@ func basicIf(line statement, index int) int {
 // Inside the quotes, the string contains only alphanumeric characters (a-z, A-Z, 0-9) and spaces
 func basicPrint(line statement) {
 	str := line.args[0]
-	println(str)
 	// condition for printing a string; the reason it's compared to 34 is because str[index] returns the byte value
 	if len(str) > 0 && str[0] == 34 && str[len(str)-1] == 34 {
-		fmt.Print(line.args[1 : len(str)-1])
+		fmt.Print(str[1 : len(str)-1])
 	} else if val, ok := variables[str]; ok { // condition for printing a variable that exists
 		fmt.Print(val)
 	}
