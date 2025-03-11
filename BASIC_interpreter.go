@@ -17,7 +17,7 @@ type statement struct {
 
 var (
 	code      []statement
-	variables map[string]int
+	variables map[string]int32
 	labels    map[int]int
 	writer    *bufio.Writer
 )
@@ -117,25 +117,28 @@ func basicLet(line statement) {
 	switch len(line.args) {
 	case 1:
 		if isInteger(line.args[0]) {
-			variables[line.args[0]], _ = strconv.Atoi(line.args[2])
+			val, _ := strconv.Atoi(line.args[2])
+			variables[line.args[0]] = int32(val)
 		} else {
 			variables[line.args[0]] = variables[line.args[2]]
 		}
 	case 3:
-		variables[line.args[0]] = func() int { i, _ := strconv.Atoi(line.args[2]); return i }()
+		variables[line.args[0]] = int32(func() int { i, _ := strconv.Atoi(line.args[2]); return i }())
 	case 5:
-		var firstTerm, secondTerm int
+		var firstTerm, secondTerm int32
 
 		// Convert first term
 		if isInteger(line.args[2]) {
-			firstTerm, _ = strconv.Atoi(line.args[2])
+			temp, _ := strconv.Atoi(line.args[2])
+			firstTerm = int32(temp)
 		} else {
 			firstTerm = variables[line.args[2]]
 		}
 
 		// Convert second term
 		if isInteger(line.args[4]) {
-			secondTerm, _ = strconv.Atoi(line.args[4])
+			temp, _ := strconv.Atoi(line.args[4])
+			secondTerm = int32(temp)
 		} else {
 			secondTerm = variables[line.args[4]]
 		}
@@ -159,15 +162,17 @@ func basicLet(line statement) {
 // IF <CONDITION> THEN GOTO L
 // <CONDITION> is one of the following: X = Y, X > Y, X < Y, X <> Y, X <= Y, or X >= Y
 func basicIf(line statement, index int) int {
-	var firstTerm, secondTerm int
+	var firstTerm, secondTerm int32
 
 	if isInteger(line.args[0]) {
-		firstTerm, _ = strconv.Atoi(line.args[0])
+		temp, _ := strconv.Atoi(line.args[0])
+		firstTerm = int32(temp)
 	} else {
 		firstTerm = variables[line.args[0]]
 	}
 	if isInteger(line.args[2]) {
-		secondTerm, _ = strconv.Atoi(line.args[2])
+		temp, _ := strconv.Atoi(line.args[2])
+		secondTerm = int32(temp)
 	} else {
 		secondTerm = variables[line.args[2]]
 	}
@@ -235,7 +240,7 @@ func basicPrintln(line statement) {
 
 func main() {
 	// Initialize the variables hashmap
-	variables = make(map[string]int)
+	variables = make(map[string]int32)
 	labels = make(map[int]int)
 	writer = bufio.NewWriter(os.Stdout)
 
@@ -243,8 +248,13 @@ func main() {
 	sort_lines()
 	add_labels()
 
+	iteration := 0
 	for i := 0; i < len(code); {
 		i = interpret(i)
+		iteration++
+		if iteration > 10000000 {
+			break
+		}
 	}
 
 	writer.Flush()
