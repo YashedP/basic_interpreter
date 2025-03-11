@@ -248,13 +248,8 @@ func main() {
 	sort_lines()
 	add_labels()
 
-	iteration := 0
 	for i := 0; i < len(code); {
 		i = interpret(i)
-		iteration++
-		if iteration > 10000000 {
-			break
-		}
 	}
 
 	writer.Flush()
